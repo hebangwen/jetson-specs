@@ -61,7 +61,7 @@
     font-weight: 600;
     position: sticky;
     top: 0;
-    z-index: 1;
+    z-index: 4;
   }
   thead th .arch-badge {
     display: inline-block;
@@ -79,11 +79,23 @@
     font-weight: 500;
     position: sticky;
     left: 0;
-    z-index: 1;
+    z-index: 2;
+    /* 实色背景 + 右侧阴影，防止横向滚动时与数据重叠 */
+    box-shadow: 2px 0 0 var(--border), 6px 0 12px rgba(0,0,0,.5);
   }
-  tbody tr:hover td, tbody tr:hover th { background: rgba(56,189,248,.06); }
-  tbody tr:nth-child(even) td, tbody tr:nth-child(even) th { background: rgba(255,255,255,.02); }
-  tbody tr:nth-child(even):hover td, tbody tr:nth-child(even):hover th { background: rgba(56,189,248,.06); }
+  /* 偶数行行名用略亮的实色，保证覆盖住滑过的数据 */
+  tbody tr:nth-child(even) th { background: #1a2540; }
+  tbody tr:hover th { background: #1f2c4d; }
+  thead th:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 5;
+    background: #0b1220;
+    box-shadow: 2px 0 0 var(--border);
+  }
+  tbody tr:hover td { background: rgba(56,189,248,.06); }
+  tbody tr:nth-child(even) td { background: rgba(255,255,255,.02); }
+  tbody tr:nth-child(even):hover td { background: rgba(56,189,248,.06); }
   .col-blackwell td { background: rgba(167,139,250,.05) !important; }
   .col-blackwell:hover td { background: rgba(167,139,250,.12) !important; }
   .na { color: #475569; }
@@ -99,12 +111,6 @@
     background: var(--card);
   }
   .error-box { color: #fda4af; border-color: rgba(253,164,175,.4); }
-  .footer {
-    text-align: center;
-    color: var(--muted);
-    font-size: 12px;
-    margin-top: 16px;
-  }
 </style>
 </head>
 <body>
@@ -114,7 +120,6 @@
     <div id="loading" class="loading">正在加载数据...</div>
     <table id="spec-table" style="display:none"></table>
   </div>
-  <p class="footer">数据由 data.js 静态加载，支持 GitHub Pages 部署及 file:// 直接双击打开</p>
 
 <script src="data.js"></script>
 <script>
@@ -137,7 +142,6 @@ function render(data) {
 
   const models = data.models;
   const params = data.params;
-  const paramNames = Object.keys(params);
 
   // 表头
   const thead = document.createElement('thead');
@@ -160,9 +164,9 @@ function render(data) {
   thead.appendChild(headRow);
   table.appendChild(thead);
 
-  // 表体
+  // 表体（GPU 行会被拆成多行，每行只展示一个数据）
   const tbody = document.createElement('tbody');
-  paramNames.forEach(pname => {
+  expandParams(params).forEach(({ name: pname, values }) => {
     const row = document.createElement('tr');
     const th = document.createElement('th');
     th.textContent = pname;
@@ -170,7 +174,7 @@ function render(data) {
 
     models.forEach((m, i) => {
       const td = document.createElement('td');
-      const val = params[pname][i];
+      const val = values[i];
       if (isNumeric(val)) {
         td.className = 'num';
         td.textContent = val;
@@ -186,6 +190,23 @@ function render(data) {
     tbody.appendChild(row);
   });
   table.appendChild(tbody);
+}
+
+// 把复合参数（如 "512 CUDA / 16 Tensor Cores / 625 MHz"）拆成多行
+// 规则：第一段 = CUDA 核心，第二段 = Tensor Cores，最后一段 = 频率，中间段（若有）= MIG/其他
+function expandParams(params) {
+  const rows = [];
+  for (const [name, values] of Object.entries(params)) {
+    if (name !== 'GPU') { rows.push({ name, values }); continue; }
+    const parts = values.map(v => String(v).split(/\s*\/\s*/));
+    rows.push({ name: 'GPU CUDA 核心', values: parts.map(p => p[0] || '-') });
+    rows.push({ name: 'GPU Tensor Cores', values: parts.map(p => p[1] || '-') });
+    if (parts.some(p => p.length > 3)) {
+      rows.push({ name: 'GPU MIG', values: parts.map(p => p.length > 3 ? p.slice(2, -1).join(' / ') : '-') });
+    }
+    rows.push({ name: 'GPU 频率', values: parts.map(p => p.length > 1 ? p[p.length - 1] : '-') });
+  }
+  return rows;
 }
 
 function isNumeric(v) {
