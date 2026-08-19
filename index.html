@@ -119,15 +119,22 @@
     background: var(--card);
   }
   .error-box { color: #fda4af; border-color: rgba(253,164,175,.4); }
+  .legend {
+    text-align: center;
+    color: var(--muted);
+    font-size: 11px;
+    margin-top: 10px;
+  }
 </style>
 </head>
 <body>
   <h1>NVIDIA Jetson 系列参数对比</h1>
-  <p class="subtitle">Orin Nano · Orin NX · AGX Orin · Thor —— 数据来源 data.js（单位：T=TFLOPS，G=GB/s）</p>
+  <p class="subtitle">Orin Nano · Orin NX · AGX Orin · Thor · DRIVE AGX —— 数据来源 data.js（单位：T=TFLOPS，G=GB/s）</p>
   <div class="table-wrap">
     <div id="loading" class="loading">正在加载数据...</div>
     <table id="spec-table" style="display:none"></table>
   </div>
+  <p class="legend">* 标记表示该型号或参数未获得 NVIDIA 官方公开确认，数据为第三方报道/推测</p>
 
 <script src="data.js"></script>
 <script>
@@ -171,6 +178,7 @@ function render(data) {
 
   const models = data.models;
   const params = data.params;
+  const uncertain = data.uncertain_models || [];
   // 展开 GPU 复合字段 → 扁平参数列表（含 name + units + values）
   const flat = expandParams(params);
 
@@ -201,27 +209,29 @@ function render(data) {
     const isBlackwell = params['架构'][i] === 'Blackwell';
     if (isBlackwell) row.classList.add('row-blackwell');
 
-    // 行名（型号）
+    // 行名（型号）；不确定型号加 * 标记
     const th = document.createElement('th');
-    th.textContent = m;
+    th.textContent = m + (data.uncertain_models && data.uncertain_models.includes(m) ? ' *' : '');
     const badge = document.createElement('span');
     badge.className = 'arch-badge ' + (isBlackwell ? 'arch-blackwell' : 'arch-ampere');
     badge.textContent = params['架构'][i];
     th.appendChild(badge);
     row.appendChild(th);
 
-    // 每个参数列
+    // 每个参数列；不确定型号的数值加 * 角标
     flat.forEach(({ values }) => {
       const td = document.createElement('td');
-      const val = values[i];
+      const raw = values[i];
+      const uncertainCell = uncertain.includes(m);
+      const val = String(raw == null ? '' : raw);
       if (isNumeric(val)) {
         td.className = 'num';
-        td.textContent = val;
-      } else if (val === '-' || val === '—') {
+        td.textContent = val + (uncertainCell ? '*' : '');
+      } else if (val === '-' || val === '—' || val === '') {
         td.className = 'na';
-        td.textContent = '—';
+        td.textContent = uncertainCell ? '—*' : '—';
       } else {
-        td.textContent = val;
+        td.textContent = val + (uncertainCell ? '*' : '');
       }
       row.appendChild(td);
     });
