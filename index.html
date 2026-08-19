@@ -64,6 +64,12 @@
     z-index: 4;
     font-size: 11px;
   }
+  thead th .unit {
+    display: block;
+    font-size: 9px;
+    color: var(--muted);
+    font-weight: 400;
+  }
   /* 行名 = 型号（sticky 左侧第一列） */
   tbody th {
     background: #16213a;
@@ -214,9 +220,15 @@ function render(data) {
   const corner = document.createElement('th');
   corner.textContent = '型号';
   headRow.appendChild(corner);
-  flat.forEach(({ name }) => {
+  flat.forEach(({ name, unit }) => {
     const th = document.createElement('th');
     th.textContent = name;
+    if (unit) {
+      const u = document.createElement('span');
+      u.className = 'unit';
+      u.textContent = unit;
+      th.appendChild(u);
+    }
     headRow.appendChild(th);
   });
   thead.appendChild(headRow);
