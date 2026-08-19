@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jetson 系列参数对比</title>
+<style>
+  :root {
+    --bg: #0f172a;
+    --card: #1e293b;
+    --border: #334155;
+    --text: #e2e8f0;
+    --muted: #94a3b8;
+    --accent: #38bdf8;
+    --ampere: #38bdf8;
+    --blackwell: #a78bfa;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    padding: 24px;
+  }
+  h1 {
+    text-align: center;
+    font-size: 28px;
+    margin-bottom: 8px;
+    background: linear-gradient(90deg, var(--accent), var(--blackwell));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .subtitle {
+    text-align: center;
+    color: var(--muted);
+    margin-bottom: 24px;
+    font-size: 14px;
+  }
+  .table-wrap {
+    overflow-x: auto;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--card);
+    box-shadow: 0 8px 24px rgba(0,0,0,.4);
+  }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    min-width: 1200px;
+    font-size: 13px;
+  }
+  th, td {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border);
+    text-align: center;
+    white-space: nowrap;
+  }
+  thead th {
+    background: #0b1220;
+    font-weight: 600;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+  thead th .arch-badge {
+    display: inline-block;
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+  .arch-ampere { background: rgba(56,189,248,.15); color: var(--ampere); border: 1px solid rgba(56,189,248,.4); }
+  .arch-blackwell { background: rgba(167,139,250,.15); color: var(--blackwell); border: 1px solid rgba(167,139,250,.4); }
+  tbody th {
+    background: #16213a;
+    text-align: left;
+    font-weight: 500;
+    position: sticky;
+    left: 0;
+    z-index: 1;
+  }
+  tbody tr:hover td, tbody tr:hover th { background: rgba(56,189,248,.06); }
+  tbody tr:nth-child(even) td, tbody tr:nth-child(even) th { background: rgba(255,255,255,.02); }
+  tbody tr:nth-child(even):hover td, tbody tr:nth-child(even):hover th { background: rgba(56,189,248,.06); }
+  .col-blackwell td { background: rgba(167,139,250,.05) !important; }
+  .col-blackwell:hover td { background: rgba(167,139,250,.12) !important; }
+  .na { color: #475569; }
+  .num { font-variant-numeric: tabular-nums; font-weight: 600; color: #7dd3fc; }
+  .error-box, .loading {
+    text-align: center;
+    padding: 40px;
+    color: var(--muted);
+    font-size: 15px;
+    border: 1px dashed var(--border);
+    border-radius: 12px;
+    margin-top: 24px;
+    background: var(--card);
+  }
+  .error-box { color: #fda4af; border-color: rgba(253,164,175,.4); }
+  .footer {
+    text-align: center;
+    color: var(--muted);
+    font-size: 12px;
+    margin-top: 16px;
+  }
+</style>
+</head>
+<body>
+  <h1>NVIDIA Jetson 系列参数对比</h1>
+  <p class="subtitle">Orin Nano · Orin NX · AGX Orin · Thor —— 数据来源 data.js</p>
+  <div class="table-wrap">
+    <div id="loading" class="loading">正在加载数据...</div>
+    <table id="spec-table" style="display:none"></table>
+  </div>
+  <p class="footer">数据由 data.js 静态加载，支持 GitHub Pages 部署及 file:// 直接双击打开</p>
+
+<script src="data.js"></script>
+<script>
+// 数据通过 <script src="data.js"> 加载，兼容 GitHub Pages 与 file:// 直接打开
+if (typeof JETSON_DATA === 'undefined') {
+  document.getElementById('loading').style.display = 'none';
+  const box = document.createElement('div');
+  box.className = 'error-box';
+  box.textContent = '⚠️ data.js 加载失败，请确认 data.js 与 index.html 在同一目录';
+  document.querySelector('.table-wrap').appendChild(box);
+} else {
+  render(JETSON_DATA);
+}
+
+function render(data) {
+  document.getElementById('loading').style.display = 'none';
+  const table = document.getElementById('spec-table');
+  table.style.display = '';
+  table.innerHTML = '';
+
+  const models = data.models;
+  const params = data.params;
+  const paramNames = Object.keys(params);
+
+  // 表头
+  const thead = document.createElement('thead');
+  const headRow = document.createElement('tr');
+  const th0 = document.createElement('th');
+  th0.textContent = '参数';
+  headRow.appendChild(th0);
+
+  models.forEach(m => {
+    const th = document.createElement('th');
+    const arch = params['架构'][models.indexOf(m)];
+    const isBlackwell = arch === 'Blackwell';
+    th.textContent = m;
+    const badge = document.createElement('span');
+    badge.className = 'arch-badge ' + (isBlackwell ? 'arch-blackwell' : 'arch-ampere');
+    badge.textContent = arch;
+    th.appendChild(badge);
+    headRow.appendChild(th);
+  });
+  thead.appendChild(headRow);
+  table.appendChild(thead);
+
+  // 表体
+  const tbody = document.createElement('tbody');
+  paramNames.forEach(pname => {
+    const row = document.createElement('tr');
+    const th = document.createElement('th');
+    th.textContent = pname;
+    row.appendChild(th);
+
+    models.forEach((m, i) => {
+      const td = document.createElement('td');
+      const val = params[pname][i];
+      if (isNumeric(val)) {
+        td.className = 'num';
+        td.textContent = val;
+      } else if (val === '-' || val === '—') {
+        td.className = 'na';
+        td.textContent = '—';
+      } else {
+        td.textContent = val;
+      }
+      if (params['架构'][i] === 'Blackwell') td.classList.add('col-blackwell');
+      row.appendChild(td);
+    });
+    tbody.appendChild(row);
+  });
+  table.appendChild(tbody);
+}
+
+function isNumeric(v) {
+  return v !== '' && !isNaN(v) && !isNaN(parseFloat(v)) && String(v).trim() !== '-';
+}
+</script>
+</body>
+</html>

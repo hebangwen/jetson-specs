@@ -1,0 +1,110 @@
+{
+  "models": [
+    "ORIN NANO 4GB",
+    "ORIN NANO 4GB (SUPER)",
+    "ORIN NANO 8GB",
+    "ORIN NANO 8GB (SUPER)",
+    "ORIN NX 8GB",
+    "ORIN NX 8GB (SUPER)",
+    "ORIN NX 16GB",
+    "ORIN NX 16GB (SUPER)",
+    "Jetson AGX Orin 32GB",
+    "Jetson AGX Orin 64GB",
+    "Jetson Thor T4000",
+    "Jetson Thor T5000"
+  ],
+  "params": {
+    "架构": [
+      "Ampere", "Ampere", "Ampere", "Ampere",
+      "Ampere", "Ampere", "Ampere", "Ampere",
+      "Ampere", "Ampere", "Blackwell", "Blackwell"
+    ],
+    "FP32 (TFLOPS)": [
+      "0.64", "1.04", "1.28", "2.09",
+      "1.57", "2.40", "1.88", "2.40",
+      "3.8", "5.3", "4.82", "8.04"
+    ],
+    "FP16/BF16 (TFLOPS)": [
+      "5", "8.5", "10", "17",
+      "13", "19", "15", "19",
+      "27", "43", "150", "258.5"
+    ],
+    "FP8 (TFLOPS)": [
+      "-", "-", "-", "-",
+      "-", "-", "-", "-",
+      "-", "-", "300", "517"
+    ],
+    "FP4 (TFLOPS)": [
+      "-", "-", "-", "-",
+      "-", "-", "-", "-",
+      "-", "-", "600", "1035"
+    ],
+    "INT8 (TOPS)": [
+      "10", "17", "20", "33",
+      "25", "38", "30", "38",
+      "54", "85", "300", "517.5"
+    ],
+    "DLA INT8 (TOPS)": [
+      "-", "-", "-", "-",
+      "10", "20", "20", "40",
+      "46", "52.5", "-", "-"
+    ],
+    "GPU": [
+      "512 CUDA / 16 Tensor Cores / 625 MHz",
+      "512 CUDA / 16 Tensor Cores / 1020 MHz",
+      "1024 CUDA / 32 Tensor Cores / 625 MHz",
+      "1024 CUDA / 32 Tensor Cores / 1020 MHz",
+      "1024 CUDA / 32 Tensor Cores / 765 MHz",
+      "1024 CUDA / 32 Tensor Cores / 1173 MHz",
+      "1024 CUDA / 32 Tensor Cores / 918 MHz",
+      "1024 CUDA / 32 Tensor Cores / 1173 MHz",
+      "1792 CUDA / 56 Tensor Cores / 930 MHz",
+      "2048 CUDA / 64 Tensor Cores / 1.3 GHz",
+      "1536-core / 64 个第五代 Tensor Cores / 6 TPC MIG / 1.57 GHz",
+      "2560-core / 96 个第五代 Tensor Cores / 10 TPC MIG / 1.57 GHz"
+    ],
+    "CPU": [
+      "6x A78 / 1.5 GHz",
+      "6x A78 / 1.7 GHz",
+      "6x A78 / 1.5 GHz",
+      "6x A78 / 1.7 GHz",
+      "6x A78 / 2.0 GHz",
+      "6x A78 / 2.0 GHz",
+      "8x A78 / 2.0 GHz",
+      "8x A78 / 2.0 GHz",
+      "8x A78AE / 2.0 GHz",
+      "12x A78AE / 2.2 GHz",
+      "12x Neoverse-V3AE / 2.6 GHz",
+      "14x Neoverse-V3AE / 2.6 GHz"
+    ],
+    "内存容量": [
+      "4GB", "4GB", "8GB", "8GB",
+      "8GB", "8GB", "16GB", "16GB",
+      "32GB", "64GB", "64GB", "128GB"
+    ],
+    "内存类型": [
+      "LPDDR5", "LPDDR5", "LPDDR5", "LPDDR5",
+      "LPDDR5", "LPDDR5", "LPDDR5", "LPDDR5",
+      "LPDDR5", "LPDDR5", "256-bit LPDDR5X", "256-bit LPDDR5X"
+    ],
+    "内存带宽 (GB/s)": [
+      "34", "51", "68", "102",
+      "102", "102", "102", "102",
+      "204.8", "204.8", "273", "273"
+    ],
+    "功耗 (W)": [
+      "7 / 10",
+      "7 / 25 / MAXN SUPER",
+      "7 / 15",
+      "15 / 25 / MAXN SUPER",
+      "10 / 15 / 20 / MAXN",
+      "10 / 15 / 20 / 40 / MAXN SUPER",
+      "10 / 15 / 25 / MAXN",
+      "10 / 15 / 25 / 40 / MAXN SUPER",
+      "15 - 40",
+      "15 - 60",
+      "40 - 70",
+      "40 - 130"
+    ]
+  }
+}
