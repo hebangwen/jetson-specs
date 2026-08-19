@@ -179,6 +179,7 @@ function render(data) {
   const models = data.models;
   const params = data.params;
   const uncertain = data.uncertain_models || [];
+  const uncertainFields = data.uncertain_fields || {};
   const hidden = data.hidden_models || [];
   // 展开 GPU 复合字段 → 扁平参数列表（含 name + units + values）
   const flat = expandParams(params);
@@ -220,11 +221,12 @@ function render(data) {
     th.appendChild(badge);
     row.appendChild(th);
 
-    // 每个参数列；不确定型号的数值加 * 角标
-    flat.forEach(({ values }) => {
+    // 每个参数列；不确定型号/字段的数值加 * 角标
+    flat.forEach(({ key, values }) => {
       const td = document.createElement('td');
       const raw = values[i];
-      const uncertainCell = uncertain.includes(m);
+      const uncertainCell = uncertain.includes(m) ||
+        (uncertainFields[key] && uncertainFields[key].includes(m));
       const val = String(raw == null ? '' : raw);
       if (isNumeric(val)) {
         td.className = 'num';
@@ -244,6 +246,7 @@ function render(data) {
 
 function expandParams(params) {
   return COLUMNS.map(([key, meta]) => ({
+    key,
     name: meta.label,
     unit: meta.unit || '',
     values: params[key],
