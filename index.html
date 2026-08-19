@@ -64,12 +64,6 @@
     z-index: 4;
     font-size: 11px;
   }
-  thead th .unit {
-    display: block;
-    font-size: 9px;
-    color: var(--muted);
-    font-weight: 400;
-  }
   /* 行名 = 型号（sticky 左侧第一列） */
   tbody th {
     background: #16213a;
@@ -120,10 +114,10 @@
   }
   .error-box { color: #fda4af; border-color: rgba(253,164,175,.4); }
   .legend {
-    text-align: center;
     color: var(--muted);
     font-size: 11px;
     margin-top: 10px;
+    text-align: left;
   }
   /* 右下角悬浮导出按钮 */
   .export-btn {
@@ -220,15 +214,9 @@ function render(data) {
   const corner = document.createElement('th');
   corner.textContent = '型号';
   headRow.appendChild(corner);
-  flat.forEach(({ name, unit }) => {
+  flat.forEach(({ name }) => {
     const th = document.createElement('th');
     th.textContent = name;
-    if (unit) {
-      const u = document.createElement('span');
-      u.className = 'unit';
-      u.textContent = unit;
-      th.appendChild(u);
-    }
     headRow.appendChild(th);
   });
   thead.appendChild(headRow);
