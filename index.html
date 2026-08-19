@@ -226,7 +226,7 @@ function expandParams(params) {
       rows.push({ name: rename[name][0], unit: rename[name][1], values });
     } else if (name === '功耗 (W)') {
       // 暂时隐藏功耗列
-      return;
+      continue;
     } else if (name === '内存容量') {
       rows.push({ name: '内存', unit: 'GB', values: values.map(v => extractNum(v)) });
     } else if (name === '内存位宽') {
