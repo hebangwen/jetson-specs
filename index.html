@@ -125,6 +125,32 @@
     font-size: 11px;
     margin-top: 10px;
   }
+  /* 右下角悬浮导出按钮 */
+  .export-btn {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 12px 18px;
+    background: linear-gradient(135deg, var(--accent), var(--blackwell));
+    color: #0b1220;
+    font-size: 14px;
+    font-weight: 700;
+    border: none;
+    border-radius: 999px;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(0,0,0,.5);
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+  .export-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0,0,0,.6);
+  }
+  .export-btn:active { transform: translateY(0); }
+  .export-btn svg { width: 16px; height: 16px; flex-shrink: 0; }
 </style>
 </head>
 <body>
@@ -135,6 +161,10 @@
     <table id="spec-table" style="display:none"></table>
   </div>
   <p class="legend">* 标记表示该型号或参数未获得 NVIDIA 官方公开确认，数据为第三方报道/推测</p>
+  <button class="export-btn" id="export-btn" title="导出一键参数">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    <span>导出 CSV</span>
+  </button>
 
 <script src="data.js"></script>
 <script>
@@ -256,6 +286,57 @@ function expandParams(params) {
 function isNumeric(v) {
   return v !== '' && !isNaN(v) && !isNaN(parseFloat(v)) && String(v).trim() !== '-';
 }
+
+// ---- 一键导出 CSV ----
+function exportCSV() {
+  if (typeof JETSON_DATA === 'undefined') { alert('数据未加载'); return; }
+  const data = JETSON_DATA;
+  const models = data.models;
+  const params = data.params;
+  const uncertain = data.uncertain_models || [];
+  const uncertainFields = data.uncertain_fields || {};
+  const hidden = data.hidden_models || [];
+  const flat = expandParams(params);
+
+  // 表头：型号 + 各参数的显示名（含单位）
+  const headCells = ['型号'];
+  flat.forEach(({ name, unit }) => {
+    headCells.push(unit ? `${name} (${unit})` : name);
+  });
+
+  const rows = [headCells];
+
+  models.forEach((m, i) => {
+    if (hidden.includes(m)) return;
+    const row = [m];
+    flat.forEach(({ key, values }) => {
+      const uncertainCell = uncertain.includes(m) ||
+        (uncertainFields[key] && uncertainFields[key].includes(m));
+      const val = String(values[i] == null ? '' : values[i]);
+      let cell = val;
+      if (val === '-' || val === '—' || val === '') cell = '—';
+      if (uncertainCell && cell !== '—') cell += '*';
+      row.push(cell);
+    });
+    rows.push(row);
+  });
+
+  // 转 CSV（加 BOM 头，避免 Excel 中文乱码）
+  const escape = (s) => /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+  const csv = rows.map(r => r.map(escape).join(',')).join('\n');
+  const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const ts = new Date().toISOString().slice(0, 10);
+  a.href = url;
+  a.download = `jetson-specs-${ts}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+document.getElementById('export-btn').addEventListener('click', exportCSV);
 </script>
 </body>
 </html>
