@@ -208,63 +208,34 @@ function render(data) {
   table.appendChild(tbody);
 }
 
-// 展开 GPU 字段并缩短单位名，返回 [{name, unit, values}]
+// 定义展示顺序和表头单位；数据原样来自 data.js（不做任何解析）
+// 字段名 -> { 显示名, 单位小字 } ；未列出的字段不展示
+const COLUMNS = [
+  ['架构',               { label: '架构' }],
+  ['FP32 (TFLOPS)',      { label: 'FP32', unit: 'TF' }],
+  ['FP16/BF16 (TFLOPS)', { label: 'FP16/BF16', unit: 'TF' }],
+  ['FP8 (TFLOPS)',       { label: 'FP8', unit: 'TF' }],
+  ['FP4 (TFLOPS)',       { label: 'FP4', unit: 'TF' }],
+  ['INT8 (TOPS)',        { label: 'INT8', unit: 'TF' }],
+  ['DLA INT8 (TOPS)',    { label: 'DLA INT8', unit: 'TF' }],
+  ['GPU CUDA 核心',       { label: 'CUDA 核心' }],
+  ['GPU Tensor 核心',     { label: 'Tensor 核心' }],
+  ['GPU MIG',            { label: 'MIG', unit: 'TPC' }],
+  ['GPU 频率 (MHz)',      { label: 'GPU 频率', unit: 'MHz' }],
+  ['CPU 核心',           { label: 'CPU 核心' }],
+  ['CPU 频率 (MHz)',      { label: 'CPU 频率', unit: 'MHz' }],
+  ['内存容量数值 (GB)',    { label: '内存', unit: 'GB' }],
+  ['内存位宽 (bit)',       { label: '位宽', unit: 'bit' }],
+  ['内存带宽 (GB/s)',     { label: '带宽', unit: 'GB/s' }],
+  ['内存类型',            { label: '内存类型' }],
+];
+
 function expandParams(params) {
-  const rows = [];
-  for (const [name, values] of Object.entries(params)) {
-    // 缩短单位名
-    const rename = {
-      'FP32 (TFLOPS)':      ['FP32', 'TF'],
-      'FP16/BF16 (TFLOPS)': ['FP16/BF16', 'TF'],
-      'FP8 (TFLOPS)':       ['FP8', 'TF'],
-      'FP4 (TFLOPS)':       ['FP4', 'TF'],
-      'INT8 (TOPS)':        ['INT8', 'TF'],
-      'DLA INT8 (TOPS)':    ['DLA INT8', 'TF'],
-      '内存带宽 (GB/s)':     ['带宽', 'GB/s'],
-    };
-    if (rename[name]) {
-      rows.push({ name: rename[name][0], unit: rename[name][1], values });
-    } else if (name === '功耗 (W)') {
-      // 暂时隐藏功耗列
-      continue;
-    } else if (name === '内存容量') {
-      rows.push({ name: '内存', unit: 'GB', values: values.map(v => extractNum(v)) });
-    } else if (name === '内存位宽') {
-      rows.push({ name: '位宽', unit: 'bit', values: values.map(v => extractNum(v)) });
-    } else if (name === 'CPU') {
-      // CPU 拆成「核心数」和「频率」两列
-      rows.push({ name: 'CPU 核心', unit: '', values: values.map(v => extractNum(v)) });
-      rows.push({ name: 'CPU 频率', unit: 'MHz', values: values.map(v => toMHz(v)) });
-    } else if (name !== 'GPU') {
-      rows.push({ name, unit: '', values });
-    } else {
-      // GPU 拆行：每段只保留数值，单位统一到表头
-      const parts = values.map(v => String(v).split(/\s*\/\s*/));
-      rows.push({ name: 'CUDA 核心', unit: '', values: parts.map(p => extractNum(p[0])) });
-      rows.push({ name: 'Tensor 核心', unit: '', values: parts.map(p => extractNum(p[1])) });
-      if (parts.some(p => p.length > 3)) {
-        rows.push({ name: 'MIG', unit: 'TPC', values: parts.map(p => p.length > 3 ? extractNum(p[2]) : '-') });
-      }
-      rows.push({ name: '频率', unit: 'MHz', values: parts.map(p => toMHz(p[p.length - 1])) });
-    }
-  }
-  return rows;
-}
-
-// 提取字符串中的首个数字（如 "512 CUDA" → "512"、"64 个第五代 Tensor Cores" → "64"）
-function extractNum(v) {
-  const m = String(v).match(/-?\d+(?:\.\d+)?/);
-  return m ? m[0] : '-';
-}
-
-// 频率统一换算到 MHz（GHz → ×1000）
-function toMHz(v) {
-  const s = String(v);
-  const m = s.match(/(-?\d+(?:\.\d+)?)\s*(GHz|MHz)/i);
-  if (!m) return '-';
-  const num = parseFloat(m[1]);
-  const val = m[2].toLowerCase() === 'ghz' ? Math.round(num * 1000) : num;
-  return String(val);
+  return COLUMNS.map(([key, meta]) => ({
+    name: meta.label,
+    unit: meta.unit || '',
+    values: params[key],
+  }));
 }
 
 function isNumeric(v) {
