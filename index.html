@@ -221,12 +221,20 @@ function expandParams(params) {
       'INT8 (TOPS)':        ['INT8', 'TF'],
       'DLA INT8 (TOPS)':    ['DLA INT8', 'TF'],
       '内存带宽 (GB/s)':     ['带宽', 'GB/s'],
-      '功耗 (W)':            ['功耗', 'W'],
     };
     if (rename[name]) {
       rows.push({ name: rename[name][0], unit: rename[name][1], values });
+    } else if (name === '功耗 (W)') {
+      // 暂时隐藏功耗列
+      return;
     } else if (name === '内存容量') {
       rows.push({ name: '内存', unit: 'GB', values: values.map(v => extractNum(v)) });
+    } else if (name === '内存位宽') {
+      rows.push({ name: '位宽', unit: 'bit', values: values.map(v => extractNum(v)) });
+    } else if (name === 'CPU') {
+      // CPU 拆成「核心数」和「频率」两列
+      rows.push({ name: 'CPU 核心', unit: '', values: values.map(v => extractNum(v)) });
+      rows.push({ name: 'CPU 频率', unit: 'MHz', values: values.map(v => toMHz(v)) });
     } else if (name !== 'GPU') {
       rows.push({ name, unit: '', values });
     } else {
