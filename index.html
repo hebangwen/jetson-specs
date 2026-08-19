@@ -179,6 +179,7 @@ function render(data) {
   const models = data.models;
   const params = data.params;
   const uncertain = data.uncertain_models || [];
+  const hidden = data.hidden_models || [];
   // 展开 GPU 复合字段 → 扁平参数列表（含 name + units + values）
   const flat = expandParams(params);
 
@@ -202,9 +203,10 @@ function render(data) {
   thead.appendChild(headRow);
   table.appendChild(thead);
 
-  // ---- 表体：每行一个型号 ----
+  // ---- 表体：每行一个型号（跳过隐藏型号） ----
   const tbody = document.createElement('tbody');
   models.forEach((m, i) => {
+    if (hidden.includes(m)) return;
     const row = document.createElement('tr');
     const isBlackwell = params['架构'][i] === 'Blackwell';
     if (isBlackwell) row.classList.add('row-blackwell');

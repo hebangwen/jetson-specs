@@ -443,5 +443,11 @@ const JETSON_DATA = {
     "Thor-X",
     "Thor-U",
     "Thor-S"
+  ],
+  "hidden_models": [
+    "DRIVE AGX Thor",
+    "Thor-X",
+    "Thor-U",
+    "Thor-S"
   ]
 };
