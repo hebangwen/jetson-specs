@@ -225,20 +225,38 @@ function expandParams(params) {
     };
     if (rename[name]) {
       rows.push({ name: rename[name][0], unit: rename[name][1], values });
+    } else if (name === '内存容量') {
+      rows.push({ name: '内存', unit: 'GB', values: values.map(v => extractNum(v)) });
     } else if (name !== 'GPU') {
       rows.push({ name, unit: '', values });
     } else {
-      // GPU 拆行
+      // GPU 拆行：每段只保留数值，单位统一到表头
       const parts = values.map(v => String(v).split(/\s*\/\s*/));
-      rows.push({ name: 'CUDA', unit: '', values: parts.map(p => p[0] || '-') });
-      rows.push({ name: 'Tensor', unit: '', values: parts.map(p => p[1] || '-') });
+      rows.push({ name: 'CUDA 核心', unit: '', values: parts.map(p => extractNum(p[0])) });
+      rows.push({ name: 'Tensor 核心', unit: '', values: parts.map(p => extractNum(p[1])) });
       if (parts.some(p => p.length > 3)) {
-        rows.push({ name: 'MIG', unit: '', values: parts.map(p => p.length > 3 ? p.slice(2, -1).join(' / ') : '-') });
+        rows.push({ name: 'MIG', unit: 'TPC', values: parts.map(p => p.length > 3 ? extractNum(p[2]) : '-') });
       }
-      rows.push({ name: '频率', unit: '', values: parts.map(p => p.length > 1 ? p[p.length - 1] : '-') });
+      rows.push({ name: '频率', unit: 'MHz', values: parts.map(p => toMHz(p[p.length - 1])) });
     }
   }
   return rows;
+}
+
+// 提取字符串中的首个数字（如 "512 CUDA" → "512"、"64 个第五代 Tensor Cores" → "64"）
+function extractNum(v) {
+  const m = String(v).match(/-?\d+(?:\.\d+)?/);
+  return m ? m[0] : '-';
+}
+
+// 频率统一换算到 MHz（GHz → ×1000）
+function toMHz(v) {
+  const s = String(v);
+  const m = s.match(/(-?\d+(?:\.\d+)?)\s*(GHz|MHz)/i);
+  if (!m) return '-';
+  const num = parseFloat(m[1]);
+  const val = m[2].toLowerCase() === 'ghz' ? Math.round(num * 1000) : num;
+  return String(val);
 }
 
 function isNumeric(v) {
