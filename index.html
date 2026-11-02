@@ -3,341 +3,1324 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Jetson 系列参数对比</title>
+<title>Jetson 模组参数对比</title>
+<meta name="description" content="NVIDIA Jetson 边缘 AI 模组横向对比：Orin 与 Thor 两代共 15 个模组的算力、内存与功耗。">
+<meta name="color-scheme" content="light">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0f172a;
-    --card: #1e293b;
-    --border: #334155;
-    --text: #e2e8f0;
-    --muted: #94a3b8;
-    --accent: #38bdf8;
-    --ampere: #38bdf8;
-    --blackwell: #a78bfa;
+    --paper:       #ecece7;
+    --sheet:       #fbfbf7;
+    --ink:         #1a1d1b;
+    --ink-2:       #5c625a;
+    --ink-3:       #8a9086;
+    --rule:        #d3d6cb;
+    --rule-soft:   #e4e6dc;
+    --rule-strong: #b9bdb1;
+
+    --steel:       #3b6b7b;
+    --steel-bar:   #5d8b9c;
+    --steel-wash:  #e9eff0;
+    --brass:       #8f6810;
+    --brass-bar:   #c2952f;
+    --brass-wash:  #f6f0df;
+
+    --alert:       #a33a2a;
+    --void:        #b3b8ad;
+
+    --sans: "IBM Plex Sans", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+    --serif: "Songti SC", "Noto Serif SC", "Source Han Serif SC", "Songti TC", STSong, serif;
+
+    --name-w: 200px;
+    --val-w: 92px;
+    --band-h: 30px;
+    --pad: 40px;
   }
+
   * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { -webkit-text-size-adjust: 100%; }
+
   body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
-    padding: 16px;
-  }
-  h1 {
-    text-align: center;
-    font-size: 24px;
-    margin-bottom: 4px;
-    background: linear-gradient(90deg, var(--accent), var(--blackwell));
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
-  .subtitle {
-    text-align: center;
-    color: var(--muted);
-    margin-bottom: 16px;
-    font-size: 12px;
-  }
-  .table-wrap {
-    overflow-x: auto;
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    background: var(--card);
-    box-shadow: 0 6px 18px rgba(0,0,0,.4);
-  }
-  table {
-    border-collapse: collapse;
-    width: 100%;
-    font-size: 11px;
-  }
-  th, td {
-    padding: 6px 8px;
-    border-bottom: 1px solid var(--border);
-    text-align: center;
-    white-space: nowrap;
-  }
-  /* 表头 = 参数列名 */
-  thead th {
-    background: #0b1220;
-    font-weight: 600;
-    position: sticky;
-    top: 0;
-    z-index: 4;
-    font-size: 11px;
-  }
-  thead th .unit {
-    display: block;
-    font-size: 9px;
-    color: var(--muted);
-    font-weight: 400;
-  }
-  /* 行名 = 型号（sticky 左侧第一列） */
-  tbody th {
-    background: #16213a;
-    text-align: left;
-    font-weight: 500;
-    position: sticky;
-    left: 0;
-    z-index: 2;
-    box-shadow: 2px 0 0 var(--border), 6px 0 12px rgba(0,0,0,.5);
-    font-size: 11px;
-    white-space: nowrap;
-  }
-  tbody th .arch-badge {
-    display: block;
-    font-size: 9px;
-    padding: 1px 6px;
-    border-radius: 999px;
-    margin-top: 2px;
-    width: fit-content;
-  }
-  .arch-ampere { background: rgba(56,189,248,.15); color: var(--ampere); border: 1px solid rgba(56,189,248,.4); }
-  .arch-blackwell { background: rgba(167,139,250,.15); color: var(--blackwell); border: 1px solid rgba(167,139,250,.4); }
-  thead th:first-child {
-    position: sticky;
-    left: 0;
-    z-index: 5;
-    background: #0b1220;
-    box-shadow: 2px 0 0 var(--border);
-  }
-  tbody tr:hover td { background: rgba(56,189,248,.06); }
-  tbody tr:nth-child(even) td { background: rgba(255,255,255,.02); }
-  tbody tr:nth-child(even):hover td { background: rgba(56,189,248,.06); }
-  tbody tr:hover th { background: #1f2c4d; }
-  /* Blackwell 型号整行淡紫背景 */
-  tbody tr.row-blackwell td { background: rgba(167,139,250,.04); }
-  tbody tr.row-blackwell td.na { background: rgba(167,139,250,.03); }
-  .na { color: #475569; }
-  .num { font-variant-numeric: tabular-nums; font-weight: 600; color: #7dd3fc; }
-  .error-box, .loading {
-    text-align: center;
-    padding: 40px;
-    color: var(--muted);
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--sans);
     font-size: 14px;
-    border: 1px dashed var(--border);
-    border-radius: 10px;
-    margin-top: 16px;
-    background: var(--card);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    padding: var(--pad);
   }
-  .error-box { color: #fda4af; border-color: rgba(253,164,175,.4); }
-  .legend {
-    color: var(--muted);
+
+  :focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+
+  .skip {
+    position: absolute;
+    left: -9999px;
+    top: 12px;
+    z-index: 100;
+    background: var(--ink);
+    color: var(--paper);
+    padding: 10px 16px;
+    font-size: 13px;
+    text-decoration: none;
+  }
+  .skip:focus { left: 12px; }
+
+  .page { max-width: 1400px; margin: 0 auto; }
+
+  /* ---------- masthead ---------- */
+
+  .masthead {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 40px;
+    padding-bottom: 22px;
+    border-bottom: 1px solid var(--rule-strong);
+  }
+
+  .masthead__main { min-width: 0; }
+
+  h1 {
+    font-family: var(--serif);
+    font-weight: 700;
+    font-size: clamp(31px, 4.4vw, 50px);
+    line-height: 1.1;
+    letter-spacing: 0.005em;
+    text-wrap: balance;
+  }
+  h1 .latin {
+    font-family: var(--serif);
+    font-weight: 700;
+    letter-spacing: 0;
+    margin-right: 0.04em;
+  }
+
+  .deck {
+    margin-top: 14px;
+    max-width: 44ch;
+    color: var(--ink-2);
+    font-size: 14px;
+    line-height: 1.65;
+    text-wrap: pretty;
+  }
+
+  .facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 26px;
+    margin-top: 18px;
+    font-size: 12px;
+    color: var(--ink-3);
+  }
+  .facts div { display: flex; align-items: baseline; gap: 7px; }
+  .facts dt { font-weight: 400; }
+  .facts dd {
+    font-family: var(--mono);
+    font-size: 12.5px;
+    color: var(--ink);
+    font-weight: 500;
+  }
+
+  .export {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 11px 16px;
+    background: transparent;
+    border: 1px solid var(--ink);
+    border-radius: 2px;
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color .16s ease, color .16s ease;
+  }
+  .export:hover { background: var(--ink); color: var(--paper); }
+  .export svg { width: 14px; height: 14px; }
+
+  /* ---------- section shell ---------- */
+
+  .section { margin-top: 52px; }
+
+  .sec-head {
+    display: flex;
+    align-items: baseline;
+    gap: 18px;
+    flex-wrap: wrap;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .sec-head h2 {
+    font-family: var(--serif);
+    font-weight: 700;
+    font-size: 23px;
+    letter-spacing: 0.01em;
+    white-space: nowrap;
+  }
+  .sec-note {
+    color: var(--ink-2);
+    font-size: 12.5px;
+    line-height: 1.5;
+  }
+
+  /* ---------- ladder ---------- */
+
+  .metric-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin: 18px 0 8px;
+  }
+  .metric {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 6px;
+    padding: 7px 12px;
+    border: 1px solid var(--rule-strong);
+    border-radius: 2px;
+    background: transparent;
+    color: var(--ink-2);
+    font-family: var(--sans);
+    font-size: 12.5px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color .14s ease, border-color .14s ease, color .14s ease;
+  }
+  .metric:hover { border-color: var(--ink-2); color: var(--ink); }
+  .metric[aria-pressed="true"] {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--paper);
+  }
+  .metric__unit {
+    font-family: var(--mono);
+    font-size: 10px;
+    opacity: .62;
+  }
+
+  .ladder-key {
+    display: flex;
+    gap: 16px;
+    margin-left: auto;
+    font-size: 11.5px;
+    color: var(--ink-2);
+  }
+  .ladder-key span { display: inline-flex; align-items: center; gap: 6px; }
+  .swatch {
+    width: 9px;
+    height: 9px;
+    border-radius: 1px;
+    display: inline-block;
+  }
+  .swatch--steel { background: var(--steel-bar); }
+  .swatch--brass { background: var(--brass-bar); }
+
+  .ladder { position: relative; }
+
+  .ladder__axis {
+    display: grid;
+    grid-template-columns: var(--name-w) 1fr var(--val-w);
+    align-items: end;
+    height: 27px;
+    margin-bottom: 2px;
+  }
+  .ladder__axis-note {
+    font-size: 10.5px;
+    color: var(--ink-3);
+    text-align: right;
+    padding-right: 14px;
+    padding-bottom: 4px;
+    white-space: nowrap;
+  }
+  .ladder__axis-scale {
+    position: relative;
+    height: 100%;
+    border-bottom: 1px solid var(--rule-strong);
+  }
+  .tick {
+    position: absolute;
+    bottom: 4px;
+    transform: translateX(-50%);
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--ink-3);
+    line-height: 1;
+  }
+  .tick--edge {
+    transform: none;
+    color: var(--ink-2);
+  }
+  .tick--start { left: 0; }
+  .tick--end { right: 0; }
+  .tick::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: -5px;
+    width: 1px;
+    height: 4px;
+    background: var(--rule-strong);
+  }
+  .tick--start::after { left: 0; }
+  .tick--end::after { left: auto; right: 0; }
+  .ladder__unit {
     font-size: 11px;
-    margin-top: 10px;
-    text-align: left;
+    color: var(--ink-3);
+    text-align: right;
+    padding-bottom: 3px;
   }
-  /* 右下角悬浮导出按钮 */
-  .export-btn {
-    position: fixed;
-    right: 20px;
-    bottom: 20px;
-    z-index: 999;
+
+  .lrow {
+    display: grid;
+    grid-template-columns: var(--name-w) 1fr var(--val-w);
+    align-items: center;
+    height: 33px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .lrow:last-child { border-bottom: 0; }
+
+  .lrow__name {
+    font-size: 11.5px;
+    font-weight: 500;
+    letter-spacing: 0.045em;
+    text-transform: uppercase;
+    color: var(--ink);
+    padding-right: 14px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .lrow__track {
+    position: relative;
+    height: 12px;
+    background-image: var(--graticule, none);
+    background-repeat: no-repeat;
+  }
+  .lrow__bar {
+    position: absolute;
+    inset: 1px auto 1px 0;
+    width: 0;
+    min-width: 3px;
+    background: var(--steel-bar);
+    transition: width .42s cubic-bezier(.2,.72,.2,1);
+    transition-delay: var(--d, 0ms);
+  }
+  .lrow[data-gen="Blackwell"] .lrow__bar { background: var(--brass-bar); }
+
+  .lrow__val {
+    font-family: var(--mono);
+    font-size: 12.5px;
+    font-weight: 500;
+    text-align: right;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+    padding-left: 12px;
+  }
+  .lrow__val--void { color: var(--ink-3); font-weight: 400; }
+  .lrow--void { height: 24px; }
+  .lrow--void .lrow__name { color: var(--ink-3); font-weight: 400; }
+
+  .ladder__foot {
+    margin-top: 16px;
+    font-size: 12.5px;
+    color: var(--ink-2);
+    max-width: 78ch;
+  }
+  .ladder__foot b {
+    font-family: var(--mono);
+    font-weight: 500;
+    color: var(--ink);
+  }
+  .ladder__foot .m {
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-size: 11.5px;
+    color: var(--ink);
+  }
+
+  /* ---------- matrix ---------- */
+
+  .toolbar {
     display: flex;
     align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin: 18px 0 12px;
+  }
+
+  .chip {
+    display: inline-flex;
+    align-items: baseline;
     gap: 6px;
-    padding: 12px 18px;
-    background: linear-gradient(135deg, var(--accent), var(--blackwell));
-    color: #0b1220;
-    font-size: 14px;
-    font-weight: 700;
-    border: none;
-    border-radius: 999px;
+    padding: 6px 11px;
+    border: 1px solid var(--rule-strong);
+    border-radius: 2px;
+    background: transparent;
+    color: var(--ink-2);
+    font-family: var(--sans);
+    font-size: 12.5px;
     cursor: pointer;
-    box-shadow: 0 4px 16px rgba(0,0,0,.5);
-    transition: transform .15s ease, box-shadow .15s ease;
+    transition: background-color .14s ease, border-color .14s ease, color .14s ease;
   }
-  .export-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(0,0,0,.6);
+  .chip:hover { border-color: var(--ink-2); color: var(--ink); }
+  .chip[aria-pressed="true"] {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--paper);
   }
-  .export-btn:active { transform: translateY(0); }
-  .export-btn svg { width: 16px; height: 16px; flex-shrink: 0; }
+  .chip__n {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    opacity: .6;
+  }
+  .chip[aria-pressed="true"] .chip__n { opacity: .75; }
+
+  .search {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .search input {
+    width: 200px;
+    padding: 7px 2px;
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid var(--rule-strong);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 13px;
+    transition: border-color .14s ease;
+  }
+  .search input::placeholder { color: var(--ink-3); }
+  .search input:hover { border-bottom-color: var(--ink-2); }
+  .search input:focus { outline: none; border-bottom-color: var(--ink); }
+  .search input:focus-visible { outline: 2px solid var(--ink); outline-offset: 4px; }
+
+  .matrix__scroll {
+    max-height: min(74vh, 780px);
+    overflow: auto;
+    overscroll-behavior: contain;
+    background: var(--sheet);
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--rule-strong) transparent;
+  }
+  .matrix__scroll::-webkit-scrollbar { width: 11px; height: 11px; }
+
+  .matrix__veil {
+    position: absolute;
+    top: 1px;
+    right: 1px;
+    bottom: 1px;
+    width: 34px;
+    border-radius: 0 2px 2px 0;
+    pointer-events: none;
+    background: linear-gradient(to left, rgba(26,29,27,.13), rgba(26,29,27,0));
+    opacity: 0;
+    transition: opacity .2s ease;
+  }
+  .matrix__panel.is-overflow .matrix__veil { opacity: 1; }
+  .matrix__panel.is-end .matrix__veil { opacity: 0; }
+
+  .matrix__scroll::-webkit-scrollbar-thumb {
+    background: var(--rule-strong);
+    border: 3px solid var(--sheet);
+    border-radius: 999px;
+  }
+
+  .matrix__panel { position: relative; }
+
+  table {
+    border-collapse: separate;
+    border-spacing: 0;
+    width: 100%;
+  }
+
+  thead .band {
+    position: sticky;
+    top: 0;
+    z-index: 6;
+    height: var(--band-h);
+    padding: 0 12px;
+    background: var(--sheet);
+    border-bottom: 1px solid var(--rule);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--ink-2);
+    text-align: left;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+  }
+  thead .band--sep { border-left: 1px solid var(--rule); }
+
+  thead .corner {
+    position: sticky;
+    top: 0;
+    left: 0;
+    z-index: 9;
+    width: var(--name-w);
+    min-width: var(--name-w);
+    padding: 0 12px;
+    background: var(--sheet);
+    border-bottom: 1px solid var(--rule);
+    border-right: 1px solid var(--rule);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--ink-2);
+    text-align: left;
+    vertical-align: bottom;
+    letter-spacing: 0.02em;
+  }
+
+  thead .col {
+    position: sticky;
+    top: var(--band-h);
+    z-index: 5;
+    padding: 9px 9px 8px;
+    background: var(--sheet);
+    border-bottom: 1px solid var(--ink);
+    border-left: 1px solid transparent;
+    font-weight: 500;
+    text-align: right;
+    vertical-align: bottom;
+    white-space: nowrap;
+  }
+  thead .col--text { text-align: left; }
+  thead .col--sep { border-left-color: var(--rule); }
+  thead .col--model {
+    left: 0;
+    z-index: 8;
+    text-align: left;
+    border-right: 1px solid var(--rule);
+    border-left: 0;
+  }
+  .h-label {
+    display: block;
+    font-size: 11.5px;
+    color: var(--ink);
+    letter-spacing: 0;
+    line-height: 1.2;
+  }
+  .h-unit {
+    display: block;
+    margin-top: 3px;
+    font-size: 10px;
+    color: var(--ink-3);
+    font-weight: 400;
+    line-height: 1.2;
+    min-height: 12px;
+  }
+
+  tbody th.model {
+    position: sticky;
+    left: 0;
+    z-index: 3;
+    width: var(--name-w);
+    min-width: var(--name-w);
+    max-width: var(--name-w);
+    padding: 8px 11px;
+    background: var(--sheet);
+    border-right: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule-soft);
+    font-size: 11.5px;
+    font-weight: 500;
+    letter-spacing: 0.045em;
+    text-transform: uppercase;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    box-shadow: 6px 0 10px -8px rgba(26,29,27,.24);
+  }
+  .model__mark {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    margin-right: 8px;
+    vertical-align: 1px;
+    border-radius: 1px;
+    background: var(--steel-bar);
+  }
+  tr[data-gen="Blackwell"] .model__mark { background: var(--brass-bar); }
+
+  tbody td {
+    padding: 8px 9px;
+    border-bottom: 1px solid var(--rule-soft);
+    border-left: 1px solid transparent;
+    font-family: var(--mono);
+    font-size: 11.5px;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+    white-space: nowrap;
+    color: var(--ink);
+  }
+  tbody td.text { font-family: var(--sans); font-size: 11.5px; text-align: left; }
+  td.wide { font-size: 10.5px; letter-spacing: 0; }
+  tbody td.sep { border-left-color: var(--rule); }
+  tbody td.void { color: var(--void); }
+  tbody td.lead { font-weight: 500; color: #000; }
+  tbody td.lead::after {
+    content: "";
+    display: inline-block;
+    width: 3px;
+    height: 3px;
+    margin-left: 5px;
+    vertical-align: 3px;
+    border-radius: 50%;
+    background: var(--ink-2);
+  }
+
+  tbody tr[data-gen="Blackwell"] td { background: #fdfbf3; }
+  tbody tr[data-gen="Blackwell"] th.model { background: #fdfbf3; }
+  tbody tr.zebra td { background: #f7f7f2; }
+  tbody tr.zebra th.model { background: #f7f7f2; }
+  tbody tr.zebra[data-gen="Blackwell"] td,
+  tbody tr.zebra[data-gen="Blackwell"] th.model { background: #faf6e9; }
+
+  tbody tr:hover td { background: var(--steel-wash); }
+  tbody tr:hover th.model { background: var(--steel-wash); }
+  tbody tr[data-gen="Blackwell"]:hover td { background: var(--brass-wash); }
+  tbody tr[data-gen="Blackwell"]:hover th.model { background: var(--brass-wash); }
+
+  tbody td.is-col { background: rgba(26,29,27,.055); }
+  tbody tr[data-gen="Blackwell"] td.is-col { background: rgba(143,104,16,.075); }
+
+  tr.gen th {
+    position: relative;
+    z-index: 2;
+    padding: 16px 12px 8px;
+    background: var(--sheet);
+    border-bottom: 1px solid var(--rule);
+    text-align: left;
+    font-family: var(--serif);
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+  }
+  tr.gen .gen__inner {
+    position: sticky;
+    left: 12px;
+    display: inline-flex;
+    align-items: baseline;
+    gap: 10px;
+  }
+  tr.gen .gen__count {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    font-weight: 400;
+    color: var(--ink-3);
+  }
+
+  tbody tr:last-child td, tbody tr:last-child th.model { border-bottom: 0; }
+
+  .matrix__hint {
+    margin-top: 10px;
+    font-size: 11.5px;
+    color: var(--ink-3);
+  }
+  .matrix__hint[hidden] { display: none; }
+
+  .empty {
+    padding: 30px 20px;
+    text-align: center;
+    color: var(--ink-2);
+    font-size: 13px;
+    line-height: 1.7;
+  }
+  .empty b { color: var(--ink); font-weight: 500; }
+
+  caption {
+    position: absolute;
+    width: 1px; height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  .foot {
+    margin-top: 44px;
+    padding-top: 14px;
+    border-top: 1px solid var(--rule);
+    max-width: 74ch;
+    font-size: 12px;
+    line-height: 1.7;
+    color: var(--ink-2);
+  }
+  .foot code {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    color: var(--ink);
+  }
+
+  .toast {
+    position: fixed;
+    left: var(--pad);
+    bottom: var(--pad);
+    z-index: 90;
+    padding: 11px 16px;
+    background: var(--ink);
+    color: var(--paper);
+    border-radius: 2px;
+    font-size: 12.5px;
+    opacity: 0;
+    transform: translateY(6px);
+    pointer-events: none;
+    transition: opacity .2s ease, transform .2s ease;
+  }
+  .toast.is-on { opacity: 1; transform: translateY(0); }
+
+  .fatal {
+    margin-top: 40px;
+    padding: 24px;
+    border: 1px solid var(--alert);
+    border-radius: 3px;
+    color: var(--ink);
+    font-size: 13px;
+    line-height: 1.7;
+    max-width: 60ch;
+  }
+  .fatal b { color: var(--alert); }
+
+  /* ---------- responsive ---------- */
+
+  @media (max-width: 900px) {
+    :root { --pad: 26px; --name-w: 168px; --val-w: 74px; }
+    .masthead { flex-direction: column; align-items: flex-start; gap: 22px; }
+    .ladder-key { margin-left: 0; width: 100%; }
+  }
+
+  @media (max-width: 640px) {
+    :root { --pad: 18px; --name-w: 158px; --val-w: 56px; }
+    body { font-size: 13.5px; }
+    .section { margin-top: 40px; }
+    .lrow__name { font-size: 10px; letter-spacing: 0.02em; padding-right: 8px; }
+    .lrow { height: 30px; }
+    .search { margin-left: 0; width: 100%; }
+    .search input { width: 100%; }
+    .matrix__scroll { max-height: 66vh; }
+    tbody th.model {
+      font-size: 10px;
+      letter-spacing: 0.02em;
+      padding: 8px 10px;
+      white-space: normal;
+      line-height: 1.25;
+    }
+    tbody td { font-size: 11px; padding: 8px 8px; }
+    thead .col, thead .corner, thead .band { padding-left: 8px; padding-right: 8px; }
+    .facts { gap: 4px 18px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition-duration: .001ms !important; animation-duration: .001ms !important; }
+  }
 </style>
 </head>
 <body>
-  <h1>NVIDIA Jetson 系列参数对比</h1>
-  <p class="subtitle">Orin Nano · Orin NX · AGX Orin · Thor · DRIVE AGX</p>
-  <div class="table-wrap">
-    <div id="loading" class="loading">正在加载数据...</div>
-    <table id="spec-table" style="display:none"></table>
+<div class="page">
+  <a class="skip" href="#matrix">跳到参数矩阵</a>
+
+  <header class="masthead">
+    <div class="masthead__main">
+      <h1><span class="latin">Jetson</span> 模组参数对比</h1>
+      <p class="deck">同一套口径，比较 15 个边缘 AI 模组的算力、内存和功耗。</p>
+      <dl class="facts" id="facts">
+        <div><dt>模组</dt><dd id="fact-models">—</dd></div>
+        <div><dt>世代</dt><dd id="fact-gens">—</dd></div>
+        <div><dt>参数</dt><dd id="fact-cols">—</dd></div>
+        <div><dt>年份</dt><dd id="fact-years">—</dd></div>
+      </dl>
+    </div>
+    <button class="export" id="export-btn" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      导出 CSV
+    </button>
+  </header>
+
+  <div id="app">
+    <div class="empty">正在读取参数…</div>
   </div>
-  <p class="legend">* 标记表示该型号或参数未获得 NVIDIA 官方公开确认，数据为第三方报道/推测</p>
-  <button class="export-btn" id="export-btn" title="导出一键参数">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-    <span>导出 CSV</span>
-  </button>
+
+  <p class="foot">
+    星号 * 表示该数值未经 NVIDIA 官方确认，来自第三方报道或推测。参数读取自 <code>data.js</code>，页面只做排版，不改写数值。
+  </p>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script src="data.js"></script>
 <script>
-// 定义展示顺序和表头单位；数据原样来自 data.js（不做任何解析）
-// 字段名 -> { 显示名, 单位小字 } ；未列出的字段不展示
-const COLUMNS = [
-  ['架构',               { label: '架构' }],
-  ['发布时间',            { label: '发布时间' }],
-  ['FP32 (TFLOPS)',      { label: 'FP32', unit: 'TF' }],
-  ['FP16/BF16 (TFLOPS)', { label: 'FP16/BF16', unit: 'TF' }],
-  ['FP8 (TFLOPS)',       { label: 'FP8', unit: 'TF' }],
-  ['FP4 (TFLOPS)',       { label: 'FP4', unit: 'TF' }],
-  ['INT8 (TOPS)',        { label: 'INT8', unit: 'TOPS' }],
-  ['DLA INT8 (TOPS)',    { label: 'DLA INT8', unit: 'TOPS' }],
-  ['GPU CUDA 核心',       { label: 'CUDA 核心' }],
-  ['GPU Tensor 核心',     { label: 'Tensor 核心' }],
-  ['GPU SM',            { label: 'SM' }],
-  ['GPU 频率 (MHz)',      { label: 'GPU 频率', unit: 'MHz' }],
-  ['CPU 核心',           { label: 'CPU 核心' }],
-  ['CPU 频率 (MHz)',      { label: 'CPU 频率', unit: 'MHz' }],
-  ['内存容量数值 (GB)',    { label: '内存', unit: 'GB' }],
-  ['内存位宽 (bit)',       { label: '位宽', unit: 'bit' }],
-  ['内存带宽 (GB/s)',     { label: '带宽', unit: 'GB/s' }],
-  ['内存类型',            { label: '内存类型' }],
-];
+(function () {
+  "use strict";
 
-if (typeof JETSON_DATA === 'undefined') {
-  document.getElementById('loading').style.display = 'none';
-  const box = document.createElement('div');
-  box.className = 'error-box';
-  box.textContent = '⚠️ data.js 加载失败，请确认 data.js 与 index.html 在同一目录';
-  document.querySelector('.table-wrap').appendChild(box);
-} else {
-  render(JETSON_DATA);
-}
+  var root = document.getElementById("app");
+  var toastEl = document.getElementById("toast");
 
-function render(data) {
-  document.getElementById('loading').style.display = 'none';
-  const table = document.getElementById('spec-table');
-  table.style.display = '';
-  table.innerHTML = '';
+  if (typeof JETSON_DATA === "undefined") {
+    root.innerHTML =
+      '<div class="fatal"><b>读不到 data.js。</b><br>' +
+      "确认 data.js 和 index.html 在同一个目录里，然后刷新页面。</div>";
+    document.getElementById("export-btn").disabled = true;
+    return;
+  }
 
-  const models = data.models;
-  const params = data.params;
-  const uncertain = data.uncertain_models || [];
-  const uncertainFields = data.uncertain_fields || {};
-  const hidden = data.hidden_models || [];
-  // 展开 GPU 复合字段 → 扁平参数列表（含 name + units + values）
-  const flat = expandParams(params);
+  /* ---------------- 配置 ---------------- */
 
-  // ---- 表头：第一列空，后面是每个参数列 ----
-  const thead = document.createElement('thead');
-  const headRow = document.createElement('tr');
-  const corner = document.createElement('th');
-  corner.textContent = '型号';
-  headRow.appendChild(corner);
-  flat.forEach(({ name, unit }) => {
-    const th = document.createElement('th');
-    th.textContent = name;
-    if (unit) {
-      const u = document.createElement('span');
-      u.className = 'unit';
-      u.textContent = unit;
-      th.appendChild(u);
-    }
-    headRow.appendChild(th);
-  });
-  thead.appendChild(headRow);
-  table.appendChild(thead);
+  var METRICS = [
+    { key: "FP32 (TFLOPS)",      label: "FP32", unit: "TFLOPS" },
+    { key: "FP16/BF16 (TFLOPS)", label: "FP16", unit: "TFLOPS" },
+    { key: "INT8 (TOPS)",        label: "INT8", unit: "TOPS" },
+    { key: "FP4 (TFLOPS)",       label: "FP4",  unit: "TFLOPS" },
+    { key: "内存带宽 (GB/s)",     label: "带宽", unit: "GB/s" }
+  ];
 
-  // ---- 表体：每行一个型号（跳过隐藏型号） ----
-  const tbody = document.createElement('tbody');
-  models.forEach((m, i) => {
-    if (hidden.includes(m)) return;
-    const row = document.createElement('tr');
-    const isBlackwell = params['架构'][i] === 'Blackwell';
-    if (isBlackwell) row.classList.add('row-blackwell');
+  var COLUMNS = [
+    { key: "发布时间",        label: "发布",  full: "发布时间", group: "平台", kind: "text" },
+    { key: "FP32 (TFLOPS)",   label: "FP32",  group: "计算", unit: "TFLOPS", kind: "num" },
+    { key: "FP16/BF16 (TFLOPS)", label: "FP16", full: "FP16/BF16", group: "计算", unit: "TFLOPS", kind: "num" },
+    { key: "FP8 (TFLOPS)",    label: "FP8",   group: "计算", unit: "TFLOPS", kind: "num" },
+    { key: "FP4 (TFLOPS)",    label: "FP4",   group: "计算", unit: "TFLOPS", kind: "num" },
+    { key: "INT8 (TOPS)",     label: "INT8",  group: "计算", unit: "TOPS",   kind: "num" },
+    { key: "DLA INT8 (TOPS)", label: "DLA",   full: "DLA INT8", group: "计算", unit: "TOPS",   kind: "num" },
+    { key: "GPU CUDA 核心",    label: "CUDA",  full: "GPU CUDA 核心", group: "GPU",  kind: "num" },
+    { key: "GPU Tensor 核心",  label: "Tensor", full: "GPU Tensor 核心", group: "GPU", kind: "num" },
+    { key: "GPU SM",          label: "SM",    full: "GPU SM", group: "GPU",  kind: "num" },
+    { key: "GPU 频率 (MHz)",   label: "GPU 频率", group: "GPU", unit: "MHz", kind: "num" },
+    { key: "CPU 核心",         label: "CPU 核心", group: "CPU", kind: "num" },
+    { key: "CPU 频率 (MHz)",   label: "CPU 频率", group: "CPU", unit: "MHz", kind: "num" },
+    { key: "内存容量数值 (GB)", label: "容量",  full: "内存容量", group: "内存", unit: "GB",  kind: "num" },
+    { key: "内存位宽 (bit)",   label: "位宽",  group: "内存", unit: "bit", kind: "num" },
+    { key: "内存带宽 (GB/s)",  label: "带宽",  group: "内存", unit: "GB/s", kind: "num" },
+    { key: "内存类型",        label: "类型",  full: "内存类型", group: "内存", kind: "text" },
+    { key: "功耗 (W)",        label: "功耗",  group: "功耗", unit: "W", kind: "text", compact: true }
+  ];
 
-    // 行名（型号）；不确定型号加 * 标记
-    const th = document.createElement('th');
-    th.textContent = m + (data.uncertain_models && data.uncertain_models.includes(m) ? ' *' : '');
-    const badge = document.createElement('span');
-    badge.className = 'arch-badge ' + (isBlackwell ? 'arch-blackwell' : 'arch-ampere');
-    badge.textContent = params['架构'][i];
-    th.appendChild(badge);
-    row.appendChild(th);
+  var data = JETSON_DATA;
+  var PARAMS = data.params;
+  var HIDDEN = new Set(data.hidden_models || []);
+  var UNCERTAIN_MODELS = data.uncertain_models || [];
+  var UNCERTAIN_FIELDS = data.uncertain_fields || {};
 
-    // 每个参数列；不确定型号/字段的数值加 * 角标
-    flat.forEach(({ key, values }) => {
-      const td = document.createElement('td');
-      const raw = values[i];
-      const uncertainCell = uncertain.includes(m) ||
-        (uncertainFields[key] && uncertainFields[key].includes(m));
-      const val = String(raw == null ? '' : raw);
-      if (isNumeric(val)) {
-        td.className = 'num';
-        td.textContent = val + (uncertainCell ? '*' : '');
-      } else if (val === '-' || val === '—' || val === '') {
-        td.className = 'na';
-        td.textContent = uncertainCell ? '—*' : '—';
-      } else {
-        td.textContent = val + (uncertainCell ? '*' : '');
+  var rows = data.models
+    .map(function (name, i) { return { name: name, i: i }; })
+    .filter(function (r) { return !HIDDEN.has(r.name); });
+
+  function archOf(i) { return PARAMS["架构"][i]; }
+
+  /* ---------------- 值处理 ---------------- */
+
+  function raw(key, i) {
+    var arr = PARAMS[key];
+    if (!arr) return "";
+    var v = arr[i];
+    return v == null ? "" : String(v);
+  }
+
+  function isBlank(s) {
+    var t = String(s).trim();
+    return t === "" || t === "-" || t === "—" || t === "--";
+  }
+
+  function num(key, i) {
+    var s = raw(key, i);
+    if (isBlank(s)) return null;
+    var n = parseFloat(s.replace(/[,\s]/g, ""));
+    return isFinite(n) ? n : null;
+  }
+
+  function isUncertain(key, model) {
+    if (UNCERTAIN_MODELS.indexOf(model) !== -1) return true;
+    var list = UNCERTAIN_FIELDS[key];
+    return !!(list && list.indexOf(model) !== -1);
+  }
+
+  function fmt(n) {
+    if (n >= 100) return String(Math.round(n));
+    if (n >= 10) return String(Math.round(n * 10) / 10);
+    return String(Math.round(n * 100) / 100);
+  }
+
+  function esc(s) {
+    return String(s).replace(/[&<>"]/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c];
+    });
+  }
+
+  /* ---------------- 页面骨架 ---------------- */
+
+  root.innerHTML =
+    '<section class="section ladder" aria-labelledby="ladder-h">' +
+      '<div class="sec-head">' +
+        '<h2 id="ladder-h">算力阶梯</h2>' +
+        '<p class="sec-note" id="ladder-note"></p>' +
+        '<div class="ladder-key">' +
+          '<span><i class="swatch swatch--steel"></i>Ampere</span>' +
+          '<span><i class="swatch swatch--brass"></i>Blackwell</span>' +
+        '</div>' +
+      '</div>' +
+      '<div class="metric-bar" role="group" aria-label="选择排序指标">' +
+        METRICS.map(function (m) {
+          return '<button class="metric" type="button" data-metric="' + esc(m.key) + '" aria-pressed="false">' +
+            esc(m.label) + '<span class="metric__unit">' + esc(m.unit) + "</span></button>";
+        }).join("") +
+      '</div>' +
+      '<div class="ladder__axis" aria-hidden="true">' +
+        '<div class="ladder__axis-note">对数刻度</div>' +
+        '<div class="ladder__axis-scale" id="axis-scale"></div>' +
+        '<div class="ladder__unit" id="axis-unit"></div>' +
+      "</div>" +
+      '<div id="ladder-rows"></div>' +
+      '<p class="ladder__foot" id="ladder-foot"></p>' +
+    "</section>" +
+
+    '<section class="section" id="matrix" aria-labelledby="matrix-h">' +
+      '<div class="sec-head">' +
+        '<h2 id="matrix-h">完整参数矩阵</h2>' +
+        '<p class="sec-note">每列最高值加粗并带圆点；空值显示为破折号。</p>' +
+      "</div>" +
+      '<div class="toolbar">' +
+        '<div class="chips" id="chips" role="group" aria-label="按世代筛选"></div>' +
+        '<div class="search"><input id="search" type="search" aria-label="搜索型号" ' +
+          'placeholder="搜索型号，例如 Thor" autocomplete="off"></div>' +
+      "</div>" +
+      '<div class="matrix__panel" id="panel">' +
+        '<div class="matrix__scroll" id="scroll">' +
+          '<table id="spec-table"><caption>Jetson 模组完整参数，按世代分组</caption></table>' +
+        "</div>" +
+        '<div class="matrix__veil" aria-hidden="true"></div>' +
+      "</div>" +
+      '<p class="matrix__hint" id="hint" hidden>表格较宽，左右滑动可以看完全部参数。</p>' +
+    "</section>";
+
+  /* ---------------- 算力阶梯 ---------------- */
+
+  var state = { metric: METRICS[1].key, gen: "all", q: "" };
+  var rowsEl = document.getElementById("ladder-rows");
+  var axisScale = document.getElementById("axis-scale");
+  var axisUnit = document.getElementById("axis-unit");
+  var footEl = document.getElementById("ladder-foot");
+  var noteEl = document.getElementById("ladder-note");
+
+  function fmt(n) {
+    return String(Number(n.toFixed(2)));
+  }
+
+  function scaleOf(values) {
+    var nums = values.filter(function (v) { return v !== null && v > 0; });
+    if (!nums.length) return null;
+    var min = Math.min.apply(null, nums);
+    var max = Math.max.apply(null, nums);
+    if (max <= min) return { min: min, max: max, f: function () { return 1; } };
+    var span = Math.log(max / min);
+    return {
+      min: min,
+      max: max,
+      f: function (v) {
+        if (v <= min) return 0;
+        return Math.log(v / min) / span;
       }
-      row.appendChild(td);
+    };
+  }
+
+  function ticksFor(scale, trackW) {
+    var out = [];
+    var minGap = Math.min(0.26, Math.max(0.15, 30 / (trackW || 640)));
+    [0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000].forEach(function (c) {
+      if (c <= scale.min * 1.1 || c >= scale.max * 0.92) return;
+      var p = scale.f(c);
+      if (p < minGap || p > 1 - minGap) return;
+      if (out.length && p - scale.f(out[out.length - 1]) < minGap) return;
+      out.push(c);
     });
-    tbody.appendChild(row);
-  });
-  table.appendChild(tbody);
-}
+    return out;
+  }
 
-function expandParams(params) {
-  return COLUMNS.map(([key, meta]) => ({
-    key,
-    name: meta.label,
-    unit: meta.unit || '',
-    values: params[key],
-  }));
-}
-
-function isNumeric(v) {
-  return v !== '' && !isNaN(v) && !isNaN(parseFloat(v)) && String(v).trim() !== '-';
-}
-
-// ---- 一键导出 CSV ----
-function exportCSV() {
-  if (typeof JETSON_DATA === 'undefined') { alert('数据未加载'); return; }
-  const data = JETSON_DATA;
-  const models = data.models;
-  const params = data.params;
-  const uncertain = data.uncertain_models || [];
-  const uncertainFields = data.uncertain_fields || {};
-  const hidden = data.hidden_models || [];
-  const flat = expandParams(params);
-
-  // 表头：型号 + 各参数的显示名（含单位）
-  const headCells = ['型号'];
-  flat.forEach(({ name, unit }) => {
-    headCells.push(unit ? `${name} (${unit})` : name);
-  });
-
-  const rows = [headCells];
-
-  models.forEach((m, i) => {
-    if (hidden.includes(m)) return;
-    const row = [m];
-    flat.forEach(({ key, values }) => {
-      const uncertainCell = uncertain.includes(m) ||
-        (uncertainFields[key] && uncertainFields[key].includes(m));
-      const val = String(values[i] == null ? '' : values[i]);
-      let cell = val;
-      if (val === '-' || val === '—' || val === '') cell = '—';
-      if (uncertainCell && cell !== '—') cell += '*';
-      row.push(cell);
+  function renderLadder() {
+    var metric = METRICS.filter(function (m) { return m.key === state.metric; })[0];
+    var entries = rows.map(function (r) {
+      return {
+        name: r.name,
+        gen: archOf(r.i),
+        value: num(metric.key, r.i),
+        text: raw(metric.key, r.i)
+      };
     });
-    rows.push(row);
+
+    var scale = scaleOf(entries.map(function (e) { return e.value; }));
+
+    if (!scale) {
+      rowsEl.innerHTML = '<p class="empty">这个指标在所有型号上都没有公开数值，换一个试试。</p>';
+      axisScale.innerHTML = "";
+      axisUnit.textContent = "";
+      footEl.textContent = "";
+      noteEl.textContent = "";
+      return;
+    }
+
+    var sorted = entries.slice().sort(function (a, b) {
+      if (a.value === null && b.value === null) return 0;
+      if (a.value === null) return 1;
+      if (b.value === null) return -1;
+      return b.value - a.value;
+    });
+
+    var ticks = ticksFor(scale, axisScale.clientWidth);
+    var axisPct = ticks.map(function (t) { return scale.f(t) * 100; });
+
+    axisScale.innerHTML =
+      '<span class="tick tick--edge tick--start">' + fmt(scale.min) + "</span>" +
+      ticks.map(function (t, k) {
+        return '<span class="tick" style="left:' + axisPct[k].toFixed(2) + '%">' + fmt(t) + "</span>";
+      }).join("") +
+      '<span class="tick tick--edge tick--end">' + fmt(scale.max) + "</span>";
+    axisUnit.textContent = metric.unit;
+
+    var graticule = ticks.length
+      ? axisPct.map(function (p) {
+          return "transparent calc(" + p.toFixed(3) + "% - 1px), var(--rule) calc(" + p.toFixed(3) + "%), transparent " + (p + 0.001).toFixed(3) + "%";
+        }).join(",")
+      : "";
+    rowsEl.style.setProperty(
+      "--graticule",
+      graticule ? "linear-gradient(to right," + graticule + ")" : "none"
+    );
+
+    rowsEl.innerHTML = sorted.map(function (e, idx) {
+      var pct = e.value === null ? 0 : scale.f(e.value) * 100;
+      var voidRow = e.value === null;
+      return '<div class="lrow' + (voidRow ? " lrow--void" : "") + '" data-gen="' + esc(e.gen) + '">' +
+        '<span class="lrow__name" title="' + esc(e.name) + '">' + esc(e.name) + "</span>" +
+        '<span class="lrow__track">' +
+          (voidRow ? "" : '<span class="lrow__bar" style="width:0%;--d:' + (idx * 11) + 'ms" data-w="' + pct.toFixed(2) + '"></span>') +
+        "</span>" +
+        '<span class="lrow__val' + (voidRow ? " lrow__val--void" : "") + '">' +
+          (voidRow ? "—" : esc(e.text)) + "</span>" +
+      "</div>";
+    }).join("");
+
+    requestAnimationFrame(function () {
+      Array.prototype.forEach.call(rowsEl.querySelectorAll(".lrow__bar"), function (bar) {
+        bar.style.width = bar.getAttribute("data-w") + "%";
+      });
+    });
+
+    noteEl.textContent = "点一个指标，整张图按它从高到低重排。";
+
+    var withVal = sorted.filter(function (e) { return e.value !== null; });
+    var parts = [];
+    if (withVal.length > 1) {
+      var hi = withVal[0], lo = withVal[withVal.length - 1];
+      var ratio = hi.value / lo.value;
+      parts.push("头尾相差 <b>" + (ratio >= 10 ? Math.round(ratio) : (Math.round(ratio * 10) / 10)) + " 倍</b>：" +
+        '<span class="m">' + esc(hi.name) + "</span> 的 " + esc(hi.text) + " 对 " +
+        '<span class="m">' + esc(lo.name) + "</span> 的 " + esc(lo.text) + "，单位 " + esc(metric.unit) + "。");
+    }
+    var gaps = ["Ampere", "Blackwell"].filter(function (g) {
+      var set = entries.filter(function (e) { return e.gen === g; });
+      return set.length && set.every(function (e) { return e.value === null; });
+    });
+    if (gaps.length) {
+      parts.push(esc(gaps.join(" 和 ")) + " 世代没有公开的 " + esc(metric.label) + " 数值。");
+    }
+    footEl.innerHTML = parts.join(" ");
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll(".metric"), function (btn) {
+    btn.setAttribute("aria-pressed", btn.getAttribute("data-metric") === state.metric ? "true" : "false");
+    btn.addEventListener("click", function () {
+      state.metric = btn.getAttribute("data-metric");
+      Array.prototype.forEach.call(document.querySelectorAll(".metric"), function (b) {
+        b.setAttribute("aria-pressed", b === btn ? "true" : "false");
+      });
+      renderLadder();
+    });
   });
 
-  // 转 CSV（加 BOM 头，避免 Excel 中文乱码）
-  const escape = (s) => /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
-  const csv = rows.map(r => r.map(escape).join(',')).join('\n');
-  const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  const ts = new Date().toISOString().slice(0, 10);
-  a.href = url;
-  a.download = `jetson-specs-${ts}.csv`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-}
+  /* ---------------- 参数矩阵 ---------------- */
 
-document.getElementById('export-btn').addEventListener('click', exportCSV);
+  var table = document.getElementById("spec-table");
+  var chipsEl = document.getElementById("chips");
+  var searchEl = document.getElementById("search");
+  var scrollEl = document.getElementById("scroll");
+  var hintEl = document.getElementById("hint");
+
+  var gens = ["Ampere", "Blackwell"].filter(function (g) {
+    return rows.some(function (r) { return archOf(r.i) === g; });
+  });
+
+  function genCount(g) {
+    return rows.filter(function (r) { return archOf(r.i) === g; }).length;
+  }
+
+  chipsEl.innerHTML =
+    '<button class="chip" type="button" data-gen="all" aria-pressed="true">全部<span class="chip__n">' + rows.length + "</span></button>" +
+    gens.map(function (g) {
+      return '<button class="chip" type="button" data-gen="' + esc(g) + '" aria-pressed="false">' +
+        esc(g) + '<span class="chip__n">' + genCount(g) + "</span></button>";
+    }).join("");
+
+  Array.prototype.forEach.call(chipsEl.querySelectorAll(".chip"), function (chip) {
+    chip.addEventListener("click", function () {
+      state.gen = chip.getAttribute("data-gen");
+      Array.prototype.forEach.call(chipsEl.querySelectorAll(".chip"), function (c) {
+        c.setAttribute("aria-pressed", c === chip ? "true" : "false");
+      });
+      renderTable();
+    });
+  });
+
+  searchEl.addEventListener("input", function () {
+    state.q = searchEl.value.trim().toLowerCase();
+    renderTable();
+  });
+
+  function visibleRows() {
+    return rows.filter(function (r) {
+      if (state.gen !== "all" && archOf(r.i) !== state.gen) return false;
+      if (state.q && r.name.toLowerCase().indexOf(state.q) === -1) return false;
+      return true;
+    });
+  }
+
+  function bands() {
+    var out = [];
+    COLUMNS.forEach(function (c) {
+      var last = out[out.length - 1];
+      if (last && last.label === c.group) last.n++;
+      else out.push({ label: c.group, n: 1 });
+    });
+    return out;
+  }
+
+  function groupStarts() {
+    var set = new Set();
+    COLUMNS.forEach(function (c, i) {
+      if (i > 0 && COLUMNS[i - 1].group !== c.group) set.add(i);
+    });
+    return set;
+  }
+
+  function renderTable() {
+    var list = visibleRows();
+    var rowCount = COLUMNS.length + 1;
+
+    if (!list.length) {
+      table.innerHTML =
+        '<tbody><tr><td colspan="' + rowCount + '"><div class="empty">' +
+        "没有匹配的型号。<br>换个关键词，或者点「全部」看完整列表。" +
+        "</div></td></tr></tbody>";
+      updateHint();
+      return;
+    }
+
+    // 每列最大值（只统计当前可见型号），用于标注领先者
+    var leads = {};
+    COLUMNS.forEach(function (c) {
+      if (c.kind !== "num") return;
+      var best = null;
+      list.forEach(function (r) {
+        var v = num(c.key, r.i);
+        if (v !== null && (best === null || v > best)) best = v;
+      });
+      leads[c.key] = best;
+    });
+
+    var starts = groupStarts();
+    var bs = bands();
+
+    var head =
+      "<thead>" +
+        '<tr class="head-band">' +
+          '<th class="corner" rowspan="2" scope="col">型号</th>' +
+          bs.map(function (b, i) {
+            return '<th class="band' + (i > 0 ? " band--sep" : "") + '" colspan="' + b.n + '" scope="colgroup">' + esc(b.label) + "</th>";
+          }).join("") +
+        "</tr>" +
+        '<tr class="head-cols">' +
+          COLUMNS.map(function (c, i) {
+            return '<th class="col' + (c.kind === "text" ? " col--text" : "") + (starts.has(i) ? " col--sep" : "") +
+              '" scope="col" title="' + esc(c.full || c.label) + '"><span class="h-label">' + esc(c.label) + "</span>" +
+              '<span class="h-unit">' + esc(c.unit || "") + "</span></th>";
+          }).join("") +
+        "</tr>" +
+      "</thead>";
+
+    var body = "";
+    var prevGen = null;
+    list.forEach(function (r, idx) {
+      var g = archOf(r.i);
+      if (g !== prevGen) {
+        var years = groupYears(g);
+        body += '<tr class="gen"><th colspan="' + rowCount + '" scope="rowgroup">' +
+          '<span class="gen__inner">' + esc(g) + " 世代" +
+          (years ? '<span class="gen__count">' + esc(years) + "</span>" : "") +
+          '<span class="gen__count">' + genCount(g) + " 个型号</span></span></th></tr>";
+        prevGen = g;
+      }
+
+      var cells = COLUMNS.map(function (c, ci) {
+        var v = raw(c.key, r.i);
+        if (c.compact) v = v.replace(/\s*\/\s*/g, "/");
+        var blank = isBlank(v);
+        var uncertain = !blank && isUncertain(c.key, r.name);
+        var cls = [];
+        if (c.kind === "text") cls.push("text");
+        if (c.compact) cls.push("wide");
+        if (starts.has(ci)) cls.push("sep");
+        if (blank) cls.push("void");
+        var n = c.kind === "num" ? num(c.key, r.i) : null;
+        if (n !== null && list.length >= 6 && leads[c.key] !== null && n === leads[c.key]) cls.push("lead");
+        return '<td class="' + cls.join(" ") + '" data-col="' + ci + '">' +
+          (blank ? "—" : esc(v) + (uncertain ? "*" : "")) + "</td>";
+      }).join("");
+
+      body += '<tr data-gen="' + esc(g) + '"' + (idx % 2 === 1 ? ' class="zebra"' : "") + ">" +
+        '<th class="model" scope="row"><span class="model__mark" aria-hidden="true"></span>' + esc(r.name) + "</th>" +
+        cells + "</tr>";
+    });
+
+    table.innerHTML = head + "<tbody>" + body + "</tbody>";
+    updateHint();
+  }
+
+  function groupYears(g) {
+    var ys = [];
+    rows.forEach(function (r) {
+      if (archOf(r.i) !== g) return;
+      var v = raw("发布时间", r.i);
+      var m = v.match(/\d{4}/);
+      if (m) ys.push(parseInt(m[0], 10));
+    });
+    if (!ys.length) return "";
+    var lo = Math.min.apply(null, ys), hi = Math.max.apply(null, ys);
+    return lo === hi ? String(lo) : lo + "–" + hi;
+  }
+
+  function initColumnHover() {
+    if (window.matchMedia("(hover: none)").matches) return;
+    var current = null;
+
+    function paint(col) {
+      Array.prototype.forEach.call(table.querySelectorAll("td[data-col]"), function (td) {
+        td.classList.toggle("is-col", col !== null && td.getAttribute("data-col") === col);
+      });
+    }
+
+    table.addEventListener("mouseover", function (e) {
+      var td = e.target.closest("td[data-col]");
+      var col = td ? td.getAttribute("data-col") : null;
+      if (col === current) return;
+      current = col;
+      paint(col);
+    });
+
+    table.addEventListener("mouseleave", function () {
+      current = null;
+      paint(null);
+    });
+  }
+
+  function updateHint() {
+    var over = scrollEl.scrollWidth - scrollEl.clientWidth > 24;
+    var atEnd = scrollEl.scrollLeft + scrollEl.clientWidth >= scrollEl.scrollWidth - 4;
+    hintEl.hidden = !over;
+    panelEl.classList.toggle("is-overflow", over);
+    panelEl.classList.toggle("is-end", atEnd);
+  }
+
+  scrollEl.addEventListener("scroll", updateHint, { passive: true });
+
+  var resizeTimer = null;
+  window.addEventListener("resize", function () {
+    updateHint();
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(renderLadder, 180);
+  });
+
+  /* ---------------- 表头信息 ---------------- */
+
+  function renderFacts() {
+    var years = [];
+    rows.forEach(function (r) {
+      var m = raw("发布时间", r.i).match(/\d{4}/);
+      if (m) years.push(parseInt(m[0], 10));
+    });
+    document.getElementById("fact-models").textContent = rows.length;
+    document.getElementById("fact-gens").textContent = gens.length;
+    document.getElementById("fact-cols").textContent = COLUMNS.length;
+    document.getElementById("fact-years").textContent = years.length
+      ? Math.min.apply(null, years) + "–" + Math.max.apply(null, years)
+      : "—";
+  }
+
+  /* ---------------- 导出 ---------------- */
+
+  var toastTimer = null;
+  function toast(msg) {
+    toastEl.textContent = msg;
+    toastEl.classList.add("is-on");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { toastEl.classList.remove("is-on"); }, 2600);
+  }
+
+  document.getElementById("export-btn").addEventListener("click", function () {
+    var list = visibleRows();
+    var head = ["型号"].concat(COLUMNS.map(function (c) {
+      var name = c.full || c.label;
+      return c.unit ? name + " (" + c.unit + ")" : name;
+    }));
+    var out = [head];
+    list.forEach(function (r) {
+      var line = [r.name];
+      COLUMNS.forEach(function (c) {
+        var v = raw(c.key, r.i);
+        var cell = isBlank(v) ? "—" : v;
+        if (!isBlank(v) && isUncertain(c.key, r.name)) cell += "*";
+        line.push(cell);
+      });
+      out.push(line);
+    });
+
+    var csv = out.map(function (line) {
+      return line.map(function (s) {
+        return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+      }).join(",");
+    }).join("\n");
+
+    var blob = new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8;" });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    var now = new Date();
+    var pad = function (n) { return (n < 10 ? "0" : "") + n; };
+    var stamp = now.getFullYear() + "-" + pad(now.getMonth() + 1) + "-" + pad(now.getDate());
+    a.href = url;
+    a.download = "jetson-specs-" + stamp + ".csv";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+
+    toast("已导出 " + list.length + " 个型号到 jetson-specs-" + stamp + ".csv");
+  });
+
+  /* ---------------- 启动 ---------------- */
+
+  initColumnHover();
+  renderFacts();
+  renderLadder();
+  renderTable();
+})();
 </script>
 </body>
 </html>
