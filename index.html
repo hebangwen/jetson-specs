@@ -568,17 +568,6 @@
   td.wide { font-size: 10.5px; letter-spacing: 0; }
   tbody td.sep { border-left-color: var(--rule); }
   tbody td.void { color: var(--void); }
-  tbody td.lead { font-weight: 500; color: #000; }
-  tbody td.lead::after {
-    content: "";
-    display: inline-block;
-    width: 3px;
-    height: 3px;
-    margin-left: 5px;
-    vertical-align: 3px;
-    border-radius: 50%;
-    background: var(--ink-2);
-  }
 
   tbody tr[data-gen="Blackwell"] td { background: #fdfbf3; }
   tbody tr[data-gen="Blackwell"] th.model { background: #fdfbf3; }
@@ -887,7 +876,7 @@
     '<section class="section" id="matrix" aria-labelledby="matrix-h">' +
       '<div class="sec-head">' +
         '<h2 id="matrix-h">完整参数矩阵</h2>' +
-        '<p class="sec-note">每列最高值加粗并带圆点；空值显示为破折号。</p>' +
+        '<p class="sec-note">「—」表示 NVIDIA 没有公布该值。</p>' +
       "</div>" +
       '<div class="toolbar">' +
         '<div class="chips" id="chips" role="group" aria-label="按世代筛选"></div>' +
@@ -1124,18 +1113,6 @@
       return;
     }
 
-    // 每列最大值（只统计当前可见型号），用于标注领先者
-    var leads = {};
-    COLUMNS.forEach(function (c) {
-      if (c.kind !== "num") return;
-      var best = null;
-      list.forEach(function (r) {
-        var v = num(c.key, r.i);
-        if (v !== null && (best === null || v > best)) best = v;
-      });
-      leads[c.key] = best;
-    });
-
     var starts = groupStarts();
     var bs = bands();
 
@@ -1179,8 +1156,6 @@
         if (c.compact) cls.push("wide");
         if (starts.has(ci)) cls.push("sep");
         if (blank) cls.push("void");
-        var n = c.kind === "num" ? num(c.key, r.i) : null;
-        if (n !== null && list.length >= 6 && leads[c.key] !== null && n === leads[c.key]) cls.push("lead");
         return '<td class="' + cls.join(" ") + '" data-col="' + ci + '">' +
           (blank ? "—" : esc(v) + (uncertain ? "*" : "")) + "</td>";
       }).join("");
@@ -1231,7 +1206,10 @@
     });
   }
 
+  var panelEl = document.getElementById("panel");
+
   function updateHint() {
+    if (!panelEl) return;
     var over = scrollEl.scrollWidth - scrollEl.clientWidth > 24;
     var atEnd = scrollEl.scrollLeft + scrollEl.clientWidth >= scrollEl.scrollWidth - 4;
     hintEl.hidden = !over;
