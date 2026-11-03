@@ -17,7 +17,6 @@ const JETSON_DATA = {
     "Jetson Thor T4000",
     "Jetson Thor T5000",
     "DRIVE AGX Thor",
-    "Thor-X",
     "Thor-U",
     "Thor-S"
   ],
@@ -34,7 +33,6 @@ const JETSON_DATA = {
       "Ampere",
       "Ampere",
       "Ampere",
-      "Blackwell",
       "Blackwell",
       "Blackwell",
       "Blackwell",
@@ -61,7 +59,6 @@ const JETSON_DATA = {
       "8.04",
       "-",
       "-",
-      "-",
       "-"
     ],
     "FP16/BF16 (TFLOPS)": [
@@ -80,7 +77,6 @@ const JETSON_DATA = {
       "-",
       "150",
       "258.5",
-      "-",
       "-",
       "-",
       "-"
@@ -103,7 +99,6 @@ const JETSON_DATA = {
       "517",
       "-",
       "-",
-      "-",
       "-"
     ],
     "FP4 (TFLOPS)": [
@@ -122,8 +117,7 @@ const JETSON_DATA = {
       "432.5",
       "600",
       "1035",
-      "2000",
-      "2000",
+      "1000",
       "1000",
       "500"
     ],
@@ -143,8 +137,7 @@ const JETSON_DATA = {
       "-",
       "300",
       "517.5",
-      "1000",
-      "-",
+      "500",
       "-",
       "-"
     ],
@@ -160,7 +153,6 @@ const JETSON_DATA = {
       "46",
       "52.5",
       "43.5",
-      "-",
       "-",
       "-",
       "-",
@@ -187,7 +179,6 @@ const JETSON_DATA = {
       "2560-core / 96 个第五代 Tensor Cores / 10 TPC MIG / 1.57 GHz",
       "-",
       "-",
-      "-",
       "-"
     ],
     "CPU": [
@@ -207,7 +198,6 @@ const JETSON_DATA = {
       "12x Neoverse-V3AE / 2.6 GHz",
       "14x Neoverse-V3AE / 2.6 GHz",
       "ARM Neoverse V3AE",
-      "-",
       "-",
       "-"
     ],
@@ -229,7 +219,6 @@ const JETSON_DATA = {
       "128GB",
       "64GB",
       "64GB",
-      "64GB",
       "64GB"
     ],
     "内存类型": [
@@ -244,7 +233,6 @@ const JETSON_DATA = {
       "LPDDR5",
       "LPDDR5",
       "LPDDR5",
-      "LPDDR5X",
       "LPDDR5X",
       "LPDDR5X",
       "LPDDR5X",
@@ -271,7 +259,6 @@ const JETSON_DATA = {
       "273",
       "273",
       "273",
-      "273",
       "273"
     ],
     "功耗 (W)": [
@@ -292,7 +279,6 @@ const JETSON_DATA = {
       "40 - 130",
       "-",
       "-",
-      "-",
       "-"
     ],
     "内存位宽": [
@@ -308,7 +294,6 @@ const JETSON_DATA = {
       "256-bit",
       "256-bit",
       "128-bit",
-      "256-bit",
       "256-bit",
       "256-bit",
       "256-bit",
@@ -334,7 +319,6 @@ const JETSON_DATA = {
       "2560",
       "-",
       "-",
-      "-",
       "-"
     ],
     "GPU Tensor 核心": [
@@ -353,7 +337,6 @@ const JETSON_DATA = {
       "-",
       "64",
       "96",
-      "-",
       "-",
       "-",
       "-"
@@ -376,7 +359,6 @@ const JETSON_DATA = {
       "1570",
       "-",
       "-",
-      "-",
       "-"
     ],
     "CPU 核心": [
@@ -395,7 +377,6 @@ const JETSON_DATA = {
       "8",
       "12",
       "14",
-      "-",
       "-",
       "-",
       "-"
@@ -418,7 +399,6 @@ const JETSON_DATA = {
       "2600",
       "-",
       "-",
-      "-",
       "-"
     ],
     "内存容量数值 (GB)": [
@@ -439,7 +419,6 @@ const JETSON_DATA = {
       "128",
       "64",
       "64",
-      "64",
       "64"
     ],
     "内存位宽 (bit)": [
@@ -455,7 +434,6 @@ const JETSON_DATA = {
       "256",
       "256",
       "128",
-      "256",
       "256",
       "256",
       "256",
@@ -481,7 +459,6 @@ const JETSON_DATA = {
       "10",
       "-",
       "-",
-      "-",
       "-"
     ],
     "GPU SM": [
@@ -500,7 +477,6 @@ const JETSON_DATA = {
       "12",
       "12",
       "20",
-      "-",
       "-",
       "-",
       "-"
@@ -523,18 +499,14 @@ const JETSON_DATA = {
       "2025",
       "2025",
       "-",
-      "-",
       "-"
     ]
   },
   "uncertain_models": [
-    "Thor-X",
     "Thor-U",
     "Thor-S"
   ],
   "hidden_models": [
-    "DRIVE AGX Thor",
-    "Thor-X",
     "Thor-U",
     "Thor-S"
   ],
